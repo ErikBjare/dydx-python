@@ -8,16 +8,11 @@ from .exceptions import DydxAPIError
 
 class Client(object):
 
-    TAKER_ACCOUNT_OWNER = '0xf809e07870dca762B9536d61A4fBEF1a17178092'
+    TAKER_ACCOUNT_OWNER = "0xf809e07870dca762B9536d61A4fBEF1a17178092"
     TAKER_ACCOUNT_NUMBER = 0
-    BASE_API_URI = 'https://api.dydx.exchange/v1/'
+    BASE_API_URI = "https://api.dydx.exchange/v1/"
 
-    def __init__(
-        self,
-        private_key,
-        account_number=0,
-        node=None
-    ):
+    def __init__(self, private_key, account_number=0, node=None):
         self.private_key = utils.normalize_private_key(private_key)
         self.account_number = account_number
         self.public_address = utils.private_key_to_address(self.private_key)
@@ -26,7 +21,7 @@ class Client(object):
             node=node,
             private_key=self.private_key,
             public_address=self.public_address,
-            account_number=self.account_number
+            account_number=self.account_number,
         )
 
     # -----------------------------------------------------------
@@ -35,69 +30,62 @@ class Client(object):
 
     def _init_session(self):
         session = requests.session()
-        session.headers.update({
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'User-Agent': 'dydx/python'
-        })
+        session.headers.update(
+            {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "User-Agent": "dydx/python",
+            }
+        )
         return session
 
     def _request(self, method, uri, **kwargs):
         complete_uri = self.BASE_API_URI + uri
         response = getattr(self.session, method)(complete_uri, **kwargs)
-        if not str(response.status_code).startswith('2'):
+        if not str(response.status_code).startswith("2"):
             raise DydxAPIError(response)
         return response.json()
 
     def _get(self, *args, **kwargs):
-        return self._request('get', *args, **kwargs)
+        return self._request("get", *args, **kwargs)
 
     def _post(self, *args, **kwargs):
-        return self._request('post', *args, **kwargs)
+        return self._request("post", *args, **kwargs)
 
     def _put(self, *args, **kwargs):
-        return self._request('put', *args, **kwargs)
+        return self._request("put", *args, **kwargs)
 
     def _delete(self, *args, **kwargs):
-        return self._request('delete', *args, **kwargs)
+        return self._request("delete", *args, **kwargs)
 
     # -----------------------------------------------------------
     # Public API
     # -----------------------------------------------------------
 
-    def get_pairs(
-        self
-    ):
-        '''
+    def get_pairs(self):
+        """
         Return all tradable pairs
 
         :returns: list of trading pairs
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/pairs')
+        """
+        return self._get("dex/pairs")
 
-    def get_my_balances(
-        self
-    ):
-        '''
+    def get_my_balances(self):
+        """
         Return balances for the loaded account
 
         :returns: list of balances
 
         :raises: DydxAPIError
-        '''
+        """
         return self.get_balances(
-            address=self.public_address,
-            number=self.account_number
+            address=self.public_address, number=self.account_number
         )
 
-    def get_balances(
-        self,
-        address,
-        number=0
-    ):
-        '''
+    def get_balances(self, address, number=0):
+        """
         Return balances for an address and account number
 
         :param address: required
@@ -109,18 +97,13 @@ class Client(object):
         :returns: list of balances
 
         :raises: DydxAPIError
-        '''
-        return self._get('accounts/' + address, params=utils.remove_nones({
-            'number': number
-        }))
+        """
+        return self._get(
+            "accounts/" + address, params=utils.remove_nones({"number": number})
+        )
 
-    def get_my_orders(
-        self,
-        pairs,
-        limit=None,
-        startingBefore=None
-    ):
-        '''
+    def get_my_orders(self, pairs, limit=None, startingBefore=None):
+        """
         Return open orders for the loaded account
 
         :param pairs: required
@@ -135,13 +118,13 @@ class Client(object):
         :returns: list of existing orders
 
         :raises: DydxAPIError
-        '''
+        """
         return self.get_orders(
             pairs=pairs,
             makerAccountOwner=self.public_address,
             makerAccountNumber=self.account_number,
             limit=limit,
-            startingBefore=startingBefore
+            startingBefore=startingBefore,
         )
 
     def get_orders(
@@ -150,9 +133,9 @@ class Client(object):
         makerAccountOwner=None,
         makerAccountNumber=None,
         limit=None,
-        startingBefore=None
+        startingBefore=None,
     ):
-        '''
+        """
         Return all open orders
 
         :param pairs: required
@@ -173,20 +156,24 @@ class Client(object):
         :returns: list of existing orders
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/orders', params=utils.remove_nones({
-            'pairs': ','.join(pairs),
-            'makerAccountOwner': makerAccountOwner,
-            'makerAccountNumber': makerAccountNumber,
-            'limit': limit,
-            'startingBefore': startingBefore
-        }))
+        """
+        return self._get(
+            "dex/orders",
+            params=utils.remove_nones(
+                {
+                    "pairs": ",".join(pairs),
+                    "makerAccountOwner": makerAccountOwner,
+                    "makerAccountNumber": makerAccountNumber,
+                    "limit": limit,
+                    "startingBefore": startingBefore,
+                }
+            ),
+        )
 
     def get_order(
-        self,
-        orderId,
+        self, orderId,
     ):
-        '''
+        """
         Return an order by id
 
         :param id: required
@@ -195,16 +182,11 @@ class Client(object):
         :returns: existing order
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/orders/'+orderId)
+        """
+        return self._get("dex/orders/" + orderId)
 
-    def get_my_fills(
-        self,
-        pairs,
-        limit=None,
-        startingBefore=None
-    ):
-        '''
+    def get_my_fills(self, pairs, limit=None, startingBefore=None):
+        """
         Return historical fills for the loaded account
 
         :param pairs: required
@@ -219,13 +201,13 @@ class Client(object):
         :returns: list of processed fills
 
         :raises: DydxAPIError
-        '''
+        """
         return self.get_fills(
             pairs=pairs,
             makerAccountOwner=self.public_address,
             makerAccountNumber=self.account_number,
             limit=limit,
-            startingBefore=startingBefore
+            startingBefore=startingBefore,
         )
 
     def get_fills(
@@ -234,9 +216,9 @@ class Client(object):
         makerAccountOwner=None,
         makerAccountNumber=None,
         limit=None,
-        startingBefore=None
+        startingBefore=None,
     ):
-        '''
+        """
         Return all historical fills
 
         :param pairs: required
@@ -257,22 +239,22 @@ class Client(object):
         :returns: list of processed fills
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/fills', params=utils.remove_nones({
-            'pairs': ','.join(pairs),
-            'makerAccountOwner': makerAccountOwner,
-            'makerAccountNumber': makerAccountNumber,
-            'limit': limit,
-            'startingBefore': startingBefore
-        }))
+        """
+        return self._get(
+            "dex/fills",
+            params=utils.remove_nones(
+                {
+                    "pairs": ",".join(pairs),
+                    "makerAccountOwner": makerAccountOwner,
+                    "makerAccountNumber": makerAccountNumber,
+                    "limit": limit,
+                    "startingBefore": startingBefore,
+                }
+            ),
+        )
 
-    def get_my_trades(
-        self,
-        pairs,
-        limit=None,
-        startingBefore=None
-    ):
-        '''
+    def get_my_trades(self, pairs, limit=None, startingBefore=None):
+        """
         Return historical trades for the loaded account
 
         :param pairs: required
@@ -287,13 +269,13 @@ class Client(object):
         :returns: list of processed trades
 
         :raises: DydxAPIError
-        '''
+        """
         return self.get_trades(
             pairs=pairs,
             makerAccountOwner=self.public_address,
             makerAccountNumber=self.account_number,
             limit=limit,
-            startingBefore=startingBefore
+            startingBefore=startingBefore,
         )
 
     def get_trades(
@@ -302,9 +284,9 @@ class Client(object):
         makerAccountOwner=None,
         makerAccountNumber=None,
         limit=None,
-        startingBefore=None
+        startingBefore=None,
     ):
-        '''
+        """
         Return all historical trades
 
         :param pairs: required
@@ -325,14 +307,19 @@ class Client(object):
         :returns: list of processed trades
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/trades', params=utils.remove_nones({
-            'pairs': ','.join(pairs),
-            'makerAccountOwner': makerAccountOwner,
-            'makerAccountNumber': makerAccountNumber,
-            'limit': limit,
-            'startingBefore': startingBefore
-        }))
+        """
+        return self._get(
+            "dex/trades",
+            params=utils.remove_nones(
+                {
+                    "pairs": ",".join(pairs),
+                    "makerAccountOwner": makerAccountOwner,
+                    "makerAccountNumber": makerAccountNumber,
+                    "limit": limit,
+                    "startingBefore": startingBefore,
+                }
+            ),
+        )
 
     def create_order(
         self,
@@ -344,7 +331,7 @@ class Client(object):
         fillOrKill=False,
         clientId=None,
     ):
-        '''
+        """
         Create an order
 
         :param makerMarket: required
@@ -371,33 +358,37 @@ class Client(object):
         :returns: Order
 
         :raises: DydxAPIError
-        '''
+        """
 
         order = {
-            'makerMarket': makerMarket,
-            'takerMarket': takerMarket,
-            'makerAmount': makerAmount,
-            'takerAmount': takerAmount,
-            'makerAccountOwner': self.public_address,
-            'makerAccountNumber': self.account_number,
-            'takerAccountOwner': self.TAKER_ACCOUNT_OWNER,
-            'takerAccountNumber': self.TAKER_ACCOUNT_NUMBER,
-            'expiration': expiration or utils.epoch_in_four_weeks(),
-            'salt': random.randint(0, 2**256)
+            "makerMarket": makerMarket,
+            "takerMarket": takerMarket,
+            "makerAmount": makerAmount,
+            "takerAmount": takerAmount,
+            "makerAccountOwner": self.public_address,
+            "makerAccountNumber": self.account_number,
+            "takerAccountOwner": self.TAKER_ACCOUNT_OWNER,
+            "takerAccountNumber": self.TAKER_ACCOUNT_NUMBER,
+            "expiration": expiration or utils.epoch_in_four_weeks(),
+            "salt": random.randint(0, 2 ** 256),
         }
-        order['typedSignature'] = utils.sign_order(order, self.private_key)
+        order["typedSignature"] = utils.sign_order(order, self.private_key)
 
-        return self._post('dex/orders', data=json.dumps(utils.remove_nones({
-            'fillOrKill': fillOrKill,
-            'clientId': clientId,
-            'order': {k: str(v) for k, v in order.items()}
-        })))
+        return self._post(
+            "dex/orders",
+            data=json.dumps(
+                utils.remove_nones(
+                    {
+                        "fillOrKill": fillOrKill,
+                        "clientId": clientId,
+                        "order": {k: str(v) for k, v in order.items()},
+                    }
+                )
+            ),
+        )
 
-    def cancel_order(
-        self,
-        hash
-    ):
-        '''
+    def cancel_order(self, hash):
+        """
         Cancel an order
 
         :param hash: required
@@ -406,18 +397,14 @@ class Client(object):
         :returns: Order
 
         :raises: DydxAPIError
-        '''
+        """
         signature = utils.sign_cancel_order(hash, self.private_key)
         return self._delete(
-            'dex/orders/' + hash,
-            headers={'Authorization': 'Bearer ' + signature}
+            "dex/orders/" + hash, headers={"Authorization": "Bearer " + signature}
         )
 
-    def get_orderbook(
-        self,
-        market
-    ):
-        '''
+    def get_orderbook(self, market):
+        """
         Get the active orderbook for a market
 
         :param market: required, name of market (e.g. WETH-DAI)
@@ -425,5 +412,5 @@ class Client(object):
         :returns: { asks: OrderOnOrderbook[], bids: OrderOnOrderbook[] }
 
         :raises: DydxAPIError
-        '''
-        return self._get('dex/orders/' + market)
+        """
+        return self._get("dex/orders/" + market)

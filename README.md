@@ -12,6 +12,8 @@
   </a>
 </div>
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 dYdX Python API for Limit Orders
 
 The library is currently tested against Python versions 2.7, 3.4, 3.5, and 3.6

@@ -1,4 +1,3 @@
-
 class DydxError(Exception):
     """Base error class for all exceptions raised in this library.
     Will never be raised naked; more specific subclasses of this exception will
@@ -13,8 +12,10 @@ class DydxAPIError(DydxError):
         except ValueError:
             self.msg = response.text
         self.response = response
-        self.request = getattr(response, 'request', None)
+        self.request = getattr(response, "request", None)
 
     def __str__(self):
-        return 'DydxAPIError(status_code=%s)(response=%s)' \
-            % (self.status_code, self.msg)
+        return "DydxAPIError(status_code=%s)(response=%s)" % (
+            self.status_code,
+            self.msg,
+        )
